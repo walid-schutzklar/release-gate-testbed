@@ -11,6 +11,7 @@ der Hersteller, nicht die Konfiguration eines anderen Projekts.
 | Datei | Zweck |
 |---|---|
 | `build.mjs`, `vercel.json` | statische Seite; die Meta-Felder `tb-commit`, `tb-build`, `tb-env` zeigen, welcher Commit ausgeliefert wird |
+| `umgebung-schluessel.pub.pem` | Isolationsprüfung: der Build ordnet jeden Umgebungsvariablen-**Namen** einer Gruppe zu (Vercel-System, Laufzeit, Plattform, sonstige `VERCEL_`/`NOW_`, unbekannt), veröffentlicht im Meta-Feld `tb-umgebung` nur Anzahlen und eine Prüfsumme und die Namensliste nur verschlüsselt (`/umgebung.json`); Werte werden nie gelesen. `umgebungStreng` in `gate-control.json` lässt den Build bei unbekannten Namen oder einem Bypass-Secret scheitern |
 | `.github/workflows/tb-gate.yml`, `.github/gate.sh` | zwei Pflichtprüfungen `TB Gate A`, `TB Gate B`; ihr Ergebnis steuert `gate-control.json` |
 | `gate-control.json` | `pass`, `fail`, `fail-on-push`, `fail-first-attempt`, `fail-first-attempt-on-push`, `timeout-on-push`, `slow-pass` je Prüfung |
 | `testbed.config.json` | Projektname und Namen der Pflichtprüfungen |
