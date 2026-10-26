@@ -10,9 +10,13 @@
 // VERCEL_/NOW_-Variable oder unbekannt. Veroeffentlicht werden nur Anzahlen,
 // eine Pruefsumme und die NAMENSLISTE verschluesselt mit dem oeffentlichen
 // Schluessel umgebung-schluessel.pub.pem (lesbar nur lokal beim Messenden).
-// Werte werden nie gelesen, ausser fuer VERCEL_GIT_COMMIT_SHA und VERCEL_ENV.
-// Mit "umgebungStreng": true in gate-control.json bricht der Build ab, sobald
-// ein Name ausserhalb der bekannten Gruppen oder ein Bypass-Secret auftaucht.
+// Werte werden nie gelesen, ausser fuer die oeffentlichen Systemangaben
+// VERCEL_GIT_COMMIT_SHA, VERCEL_ENV, VERCEL_URL und VERCEL_BRANCH_URL (M6).
+// umgebung-basis.json fuehrt die Plattform-Namen nur als SHA-256.
+// "umgebungStreng" in gate-control.json: true = jeder Build, "preview" = nur
+// Preview-Builds (deren Seite geschuetzt ist; das Build-Ergebnis ist dort der
+// einzige Kanal). Dann bricht der Build ab, sobald ein Name ausserhalb der
+// bekannten Gruppen oder ein Bypass-Secret auftaucht.
 import { constants, createCipheriv, createHash, publicEncrypt, randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
@@ -39,14 +43,16 @@ const lies = (datei, fallback) => {
     return fallback;
   }
 };
-const basis = new Set(lies('umgebung-basis.json', { namen: [] }).namen);
-const streng = lies('gate-control.json', {}).umgebungStreng === true;
+const basis = new Set(lies('umgebung-basis.json', { sha256: [] }).sha256);
+const strengWert = lies('gate-control.json', {}).umgebungStreng;
+const streng = strengWert === true || strengWert === umgebung;
+const hashName = (n) => createHash('sha256').update(n).digest('hex');
 
 const gruppen = { system: [], laufzeit: [], plattform: [], vercelIntern: [], unbekannt: [] };
 for (const n of Object.keys(env).sort()) {
   if (SYSTEM.has(n)) gruppen.system.push(n);
   else if (LAUFZEIT.some((m) => m.test(n))) gruppen.laufzeit.push(n);
-  else if (basis.has(n)) gruppen.plattform.push(n);
+  else if (basis.has(hashName(n))) gruppen.plattform.push(n);
   else if (/^(VERCEL|NOW)_/.test(n)) gruppen.vercelIntern.push(n);
   else gruppen.unbekannt.push(n);
 }
@@ -85,7 +91,9 @@ const html = `<!doctype html>
 <meta name="tb-commit" content="${commit}">
 <meta name="tb-build" content="${zeit}">
 <meta name="tb-env" content="${umgebung}">
-<meta name="tb-umgebung" content="${zeile};namen=${namenStatus}">
+<meta name="tb-umgebung" content="${zeile};namen=${namenStatus};streng=${streng ? 1 : 0}">
+<meta name="tb-url" content="${env.VERCEL_URL || ''}">
+<meta name="tb-branch-url" content="${env.VERCEL_BRANCH_URL || ''}">
 <title>release-gate-testbed</title>
 </head>
 <body>
