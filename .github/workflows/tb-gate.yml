@@ -1,4 +1,4 @@
-name: TB Release Gate
+﻿name: TB Release Gate
 
 # Zwei Pflichtpruefungen fuer das Testobjekt. Ihr Ergebnis steuert allein
 # gate-control.json im geprueften Commit; so laesst sich jeder Messfall
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   gate-a:
-    name: TB Gate A
+    name: TB Gate A (umbenannt fuer M3)
     runs-on: ubuntu-latest
     timeout-minutes: 3
     permissions:
