@@ -1,0 +1,9 @@
+# Nie veroeffentlichen: projektbezogene Werte und Sperrliste
+testbed.local.json
+# Messbelege bleiben lokal und werden gesondert gesichert
+belege/
+# Build-Ausgabe und lokale Verknuepfungen
+public/
+.vercel/
+node_modules/
+.env*

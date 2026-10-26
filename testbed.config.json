@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 2,
+  "hinweis": "Projektbezogene Werte (Repository, Produktionsadresse) und die Sperrliste stehen in testbed.local.json. Diese Datei wird nie veroeffentlicht (.gitignore). Fehlt sie oder enthaelt sie Platzhalter, verweigern alle Skripte, die das Netz ansprechen. Vorlage: testbed.local.example.json.",
+  "vercelProjekt": "release-gate-testbed",
+  "pflichtpruefungen": ["TB Gate A", "TB Gate B"]
+}

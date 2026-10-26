@@ -1,0 +1,14 @@
+{
+  "name": "release-gate-testbed",
+  "private": true,
+  "description": "Synthetisches Testobjekt fuer das Herstellerverhalten von GitHub-Rulesets und Vercel Deployment Checks. Keine echten Daten, keine Geheimnisse.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "selbsttest": "node scripts/selbsttest.mjs",
+    "guard": "node scripts/guard.mjs"
+  }
+}

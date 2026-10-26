@@ -1,0 +1,12 @@
+{
+  "hinweis": "Vorlage. Als testbed.local.json kopieren und die Werte eintragen. testbed.local.json wird nie veroeffentlicht.",
+  "githubRepo": "<OWNER>/release-gate-testbed",
+  "produktionsAdresse": "https://release-gate-testbed.vercel.app/",
+  "verboten": {
+    "repos": ["beispiel/produktion"],
+    "hostGenau": ["produktion.example.com"],
+    "hostPraefix": ["produktion-"],
+    "hostEnthaelt": ["supabase.co", "supabase.com"],
+    "imInhalt": ["beispiel-intern"]
+  }
+}
