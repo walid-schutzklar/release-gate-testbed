@@ -1,6 +1,6 @@
 {
   "hinweis": "Steuert das Verhalten der beiden Pflichtpruefungen fuer genau diesen Commit. Werte: pass | fail | fail-on-push | fail-first-attempt | fail-first-attempt-on-push | timeout-on-push | slow-pass. Jede Aenderung ist ein eigener Commit mit Messzweck im Commit-Text.",
-  "TB Gate A": "pass",
+  "TB Gate A": "fail-first-attempt",
   "TB Gate B": "pass",
   "slowSekunden": 240
 }
