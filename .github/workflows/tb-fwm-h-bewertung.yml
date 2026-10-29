@@ -1,0 +1,42 @@
+name: TB FW-M h Bewertung
+
+# FW-M Fall (h) im Testobjekt (synthetisch): nur lesende Bewertung. Laeuft
+# ausschliesslich bei Push auf Messzweige fwm/h-bewertung-*, nie auf main.
+# Fuehrt den Testpruefer in Sicht "voll" fuer den Ziel-Commit aus
+# fwm/h-ziel.txt aus und listet dessen Check-Runs mit App-Kennung.
+# Keine Geheimnisse, keine Schreibrechte.
+
+on:
+  push:
+    branches: ['fwm/h-bewertung-*']
+
+permissions: {}
+
+jobs:
+  bewertung:
+    name: TB FW-M h Bewertung
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      checks: read
+      statuses: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Testpruefer in Sicht voll
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ziel="$(tr -d '[:space:]' < fwm/h-ziel.txt)"
+          echo "ZIEL=$ziel"
+          echo "BEWERTUNG_ZEIT=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          set +e
+          node fwm/tb-pruefer.mjs --sha "$ziel" --sicht voll
+          echo "PRUEFER_EXIT=$?"
+          set -e
+          echo "CHECK_RUNS (ID, Name, App, Status, Ergebnis):"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$ziel/check-runs?filter=all&per_page=100" --jq '.check_runs[] | [.id,.name,.app.id,.status,.conclusion] | @tsv'
