@@ -1,0 +1,39 @@
+name: TB Wache
+
+# FW-M im Testobjekt (synthetisch): eigenstaendige Testwache. Nur lesende
+# Erkennung, blockiert nichts. Ausloeser ausschliesslich status und
+# deployment_status. Ereignisdaten liest fwm/tb-wache.mjs aus der
+# Ereignisdatei; diese Datei interpoliert keine Ereignisdaten. Keine
+# Geheimnisse, keine Schreibrechte, Actions auf Commit-SHA.
+
+on:
+  status:
+  deployment_status:
+
+permissions: {}
+
+concurrency:
+  group: tb-wache-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  erkennung:
+    name: TB Wache (Erkennung)
+    if: (github.event_name == 'status' && (github.event.context == 'TB Gate A' || github.event.context == 'TB Gate B')) || (github.event_name == 'deployment_status' && github.event.deployment.environment == 'Production' && github.event.deployment_status.state == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      checks: read
+      statuses: read
+      deployments: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Testwache
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node fwm/tb-wache.mjs
