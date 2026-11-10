@@ -70,7 +70,23 @@ if (streng && (offen.length > 0 || bypass)) {
   process.exit(1);
 }
 
+// Bauzeit aus build-delay.txt (ganze Sekunden, 0 bis 600) und version.txt mit der Commit-SHA.
+// Fehlt build-delay.txt, wartet der Build nicht; ein ungueltiger Wert bricht den Build ab.
+const hoechstensSekunden = 600;
+const liesWartezeit = () => {
+  if (!existsSync('build-delay.txt')) return 0;
+  const text = readFileSync('build-delay.txt', 'utf8').trim();
+  if (!/^[0-9]{1,3}$/.test(text) || Number(text) > hoechstensSekunden) {
+    console.error('build-delay.txt enthaelt keine ganze Zahl von 0 bis 600 - Build abgebrochen');
+    process.exit(1);
+  }
+  return Number(text);
+};
+const wartezeit = liesWartezeit();
+console.log(`Bauzeit: build-delay=${wartezeit}s commit=${env.VERCEL_GIT_COMMIT_SHA || 'FEHLT'} start=${new Date().toISOString()}`);
+await new Promise((fertig) => setTimeout(fertig, wartezeit * 1000));
 mkdirSync('public', { recursive: true });
+writeFileSync('public/version.txt', (env.VERCEL_GIT_COMMIT_SHA || 'FEHLT') + String.fromCharCode(10));
 let namenStatus = 'ohne-schluessel';
 if (existsSync('umgebung-schluessel.pub.pem')) {
   const schluessel = randomBytes(32);
